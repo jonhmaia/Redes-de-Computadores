@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Repeating Group - Vídeos HLS</title>
+    <style>
+        .container {
+            max-width: 50%;
+
+        }
+
+        .video-container {
+            position: relative;
+            width: fit-content;
+            height: 115px;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            /* Centraliza o container na página */
+            float: left;
+            /* Adiciona flutuação para alinhar à esquerda */
+            margin-right: 20px;
+            /* Espaçamento entre a div do vídeo e a div lateral */
+        }
+
+        .video-info {
+            float: left;
+            /* Adiciona flutuação para alinhar à esquerda */
+            margin-top: 20px;
+            /* Espaçamento entre as divs */
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .video-play-button {
+            width: 64px;
+            height: 64px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .video-play-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 16px 0 16px 26px;
+            border-color: transparent transparent transparent white;
+            margin-left: 5px;
+            /* Adjusts for the skew of the triangle to center it */
+        }
+    </style>
+</head>
+
+<body>
+    <div class=" container">
+        <div class="video-container" data-video-src="">
+            <button class="video-play-button">
+                <div class="video-play-icon"></div> <!-- Ícone de play -->
+            </button>
+            <video controls></video>
+        </div>
+    </div>
+</body>
+
+
+
+<script>
+    var script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/hls.js@latest";
+    document.head.appendChild(script);
+
+    script.onload = function () {
+        var videoContainers = document.querySelectorAll('.video-container');
+
+        videoContainers.forEach(function (container) {
+            var video = container.querySelector('video');
+            var playButton = container.querySelector('.video-play-button');
+            var videoSrc = container.getAttribute('data-video-src');
+
+            function initializeHLS() {
+                if (!video.hlsInitialized) {
+                    playButton.style.display = 'none';
+                    video.style.display = 'block';
+
+                    if (Hls.isSupported()) {
+                        var hls = new Hls();
+                        hls.loadSource(videoSrc);
+                        hls.attachMedia(video);
+                        video.hlsInitialized = true;
+                        video.play();
+                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = videoSrc;
+                        video.hlsInitialized = true;
+                        video.play();
+                    }
+                }
+            }
+
+            playButton.addEventListener('click', initializeHLS);
+        });
+    };
+</script>
+
+</body>
+
+</html>
